@@ -11,7 +11,7 @@ const router = express.Router();
 
 router.post("/addProduct", auth, addProduct);
 router.get("/fetchProduct/:id", auth, fetchProduct);
-router.get("/allProducts", fetchAllProducts);
+router.get("/allProducts", auth, fetchAllProducts);
 router.delete("/deleteProduct/:id", auth, deleteProduct);
 
 export default router;
