@@ -95,31 +95,29 @@ export const updateProfile = async (req, res) => {
   const { name, email, gender } = req.body || {};
   const file = req?.files?.file;
   try {
-    const user = await User.findById(req.user.id);
-    console.log(user);
+    const user = await User.findById(req.user._id);
+    if (!user) {
+      return res
+        .status(400)
+        .json({ success: false, message: "User Not Found" });
+    }
 
     const updateData = {};
-
-    if (name) updateData.name = name;
 
     if (!name) {
       return res
         .status(400)
         .json({ success: false, message: "Please enter your name" });
     }
-
-    if (!file) {
-      return res
-        .status(400)
-        .json({ success: false, message: "Please upload the image" });
-    }
+    updateData.name = name;
+    if (gender) updateData.gender = gender;
 
     if (file) {
       const result = await uploadFileToCloudinary(file);
       updateData.profileImage = result;
     }
 
-    const updateUser = await User.findByIdAndUpdate(req.user.id, updateData, {
+    const updateUser = await User.findByIdAndUpdate(req.user._id, updateData, {
       new: true,
     });
 
@@ -131,7 +129,7 @@ export const updateProfile = async (req, res) => {
 
     res.status(200).json({
       success: true,
-      message: "Profie Updated Successfully",
+      message: "Profile Updated Successfully",
       updateUser,
     });
   } catch (error) {

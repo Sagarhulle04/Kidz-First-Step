@@ -2,22 +2,24 @@ import jwt from "jsonwebtoken";
 
 export const auth = async (req, res, next) => {
   try {
-    const token = req.headers.authorization.split(" ")[1];
+    const authHeader = req.headers.authorization;
+    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+      return res
+        .status(401)
+        .json({ success: false, message: "Please Login first" });
+    }
 
+    const token = authHeader.split(" ")[1];
     if (!token) {
       return res
-        .status(400)
-        .json({ success: false, message: "Please Re-Login" });
+        .status(401)
+        .json({ success: false, message: "Please Login first" });
     }
 
     const user = jwt.verify(token, process.env.secretKey);
-
-    // console.log(user);
-
     req.user = user;
-
     next();
   } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
+    res.status(401).json({ success: false, message: "Session expired or invalid token. Please Login again." });
   }
 };

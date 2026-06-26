@@ -10,6 +10,7 @@ import cors from "cors";
 import userRouter from "./routes/user.routes.js";
 import productRouter from "./routes/product.routes.js";
 import orderRouter from "./routes/order.routes.js";
+import cartRouter from "./routes/cart.routes.js";
 
 const app = express();
 app.use(express.json());
@@ -26,6 +27,7 @@ app.use(
 app.use("/", userRouter);
 app.use("/", productRouter);
 app.use("/", orderRouter);
+app.use("/", cartRouter);
 
 main()
   .then(() => {

@@ -94,6 +94,13 @@ export const fetchAllProducts = async (req, res) => {
 export const deleteProduct = async (req, res) => {
   const id = req.params.id;
   try {
+    const role = req.user.role;
+    if (role !== "admin") {
+      return res
+        .status(403)
+        .json({ success: false, message: "Only Admin Can Delete The Product" });
+    }
+
     const product = await Product.findById(id);
 
     if (!product) {

@@ -40,7 +40,7 @@ export const orderDetails = async (req, res) => {
     }
 
     const addressDetails = await Address.create({
-      user: req.user.id,
+      user: req.user._id,
       product: product?._id,
       address,
       notes,
@@ -80,6 +80,44 @@ export const fetchOrders = async (req, res) => {
     }
 
     res.status(200).json({ success: true, message: "Order details", order });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+export const fetchMyOrders = async (req, res) => {
+  try {
+    const orders = await Order.find({ user: req.user._id })
+      .populate("product")
+      .populate("address")
+      .sort({ createdAt: -1 });
+
+    res.status(200).json({ success: true, message: "My Orders", orders });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+export const fetchAdminOrders = async (req, res) => {
+  try {
+    if (req.user.role !== "admin") {
+      return res
+        .status(403)
+        .json({ success: false, message: "Access denied. Admins only." });
+    }
+
+    // Find all products created by this admin
+    const products = await Product.find({ user: req.user._id });
+    const productIds = products.map((p) => p._id);
+
+    // Find orders containing these products
+    const orders = await Order.find({ product: { $in: productIds } })
+      .populate("user", "-password")
+      .populate("product")
+      .populate("address")
+      .sort({ createdAt: -1 });
+
+    res.status(200).json({ success: true, message: "Customer Orders", orders });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }
