@@ -70,11 +70,6 @@ export const login = async (req, res) => {
       { expiresIn: "2h" },
     );
 
-    res.cookie("token", token, {
-      httpOnly: true,
-      secure: false,
-    });
-
     res
       .status(200)
       .json({ success: true, message: "LoggedIn Successfully", user, token });
@@ -142,16 +137,4 @@ export const updateProfile = async (req, res) => {
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }
-};
-
-export const logout = (req, res) => {
-  res.clearCookie("token", {
-    httpOnly: true,
-    secure: false,
-  });
-
-  return res.status(200).json({
-    success: true,
-    message: "Logged out successfully!",
-  });
 };
